@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load widget_tweaks %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'chat_platform/css/bootstrap.min.css' %}">
+</head>
+<style>
+  body {
+    background-color: #212529;
+  }
+  .vertical-center {
+    margin:0 auto;
+    width:300px;
+    transform: translateY(30%);
+  }
+</style>
+<body>
+  {% for msg in messages %}
+    <p>{{msg}}</p>
+  {% endfor %}
+  <div class="h-100 d-flex align-items-center justify-content-center">
+    <form action="", method="POST", class="vertical-center">
+        {% csrf_token %}
+        <div class="form-group mb-2">
+        <label for="username" style="color: white;"><b>Username</b></label>
+        {% render_field form.username placeholder="nick321" class="form-control" %}
+        </div>
+        <div class="form-group mb-2">
+        <label for="first_name" style="color: white;"><b>First Name</b></label>
+        {% render_field form.first_name placeholder="Nick" class="form-control" %}
+        </div>
+        <div class="form-group mb-2">
+        <label for="last_name" style="color: white;"><b>Last Name</b></label>
+        {% render_field form.last_name placeholder="Smith" class="form-control" %}
+        </div>
+        <div class="form-group mb-2">
+        <label for="email" style="color: white;"><b>Email</b></label>
+        {% render_field form.email placeholder="NickSmith@gama.com" class="form-control" %}
+        </div>
+        <div class="form-group mb-2">
+        <label for="password1" style="color: white;"><b>Password</b></label>
+        {% render_field form.password1 placeholder="Nick@20092" class="form-control" %}
+        </div>
+        <div class="form-group mb-2">
+        <label for="password2" style="color: white;"><b>Retype Password</b></label>
+        {% render_field form.password2 placeholder="Nick@20092" class="form-control" %}
+        </div>
+        <div class="vertical-center">
+        <input type="submit" class="btn btn-primary" style="width:300px" value="Submit">
+        </div>
+      </form>
+    </div>
+</body>
+</html>

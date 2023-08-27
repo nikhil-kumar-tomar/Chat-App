@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+{% load widget_tweaks %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'chat_platform/css/bootstrap.min.css' %}">
+</head>
+<style>
+body {
+    background-color: #212529;
+}
+ .vertical-center {
+    margin:0 auto;
+    width:300px;
+    transform: translateY(50%);
+}
+  </style>
+<body>
+
+  {% for messg in messages %}
+  {% if "success" in messg.tags %}
+    <p style="color:lightgreen;">{{messg}}</p>
+  {% else %}
+    <p style="color:red;">{{messg}}</p>
+  {% endif %}
+  {% endfor %}
+    <div class="h-100 d-flex align-items-center justify-content-center">
+    <form action="", method="POST" class="form-group vertical-center">
+        {% csrf_token %}
+        <div class="mb-2">
+        <label for="username" style="color: white;"><b>Username</b></label>
+        {% render_field form.username placeholder="nickos321" class="form-control" style="width:300px;" %}
+        </div>
+        <div class="mb-2">
+        <label for="password" style="color: white;"><b>Password</b></label>
+        {% render_field form.password placeholder="Nickos@2389" class="form-control" style="width:300px;" %}
+        </div>
+        <div class="vertical-center"> 
+        <input type="submit" class="btn btn-primary" style="width:300px" value="Submit">
+        </div>
+      </form>
+    </div>
+
+</body>
+</html>
