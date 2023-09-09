@@ -1,10 +1,13 @@
-from django.shortcuts import render,HttpResponseRedirect
+from django.shortcuts import render,HttpResponseRedirect, HttpResponse
 from .forms import *
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from .miscellaneous import object_exists, object_creator
 from django.db.models import Q
 from django.views import View
+import redis
+from chat.models import Chats 
+from django.conf import settings
 
 # Create your views here.
 
@@ -21,15 +24,17 @@ class registration(View):
     
     def post(self, request):
         form = self.form_class(request.POST)
-        print(request.POST)
         if User.objects.filter(Q(email = request.POST["email"]) | Q(username = request.POST["username"])):
             messages.error(request,"Email or Username Already Exists, Please use a different email")
+            return HttpResponseRedirect("/registration/")
 
         if form.is_valid():
-            instance = form.save()
-            print(instance)
+            form.save()
             messages.success(request, "Signed Up Successfully")
             return HttpResponseRedirect("/login/")
+        else:
+            messages.error(request, f"{form.errors}")
+            
         return HttpResponseRedirect("/registration/")
 
 class logins(View):
@@ -78,6 +83,24 @@ def room(request, room_name):
     context = {
         "room_name": room_name,
     }
+    if "_" in room_name:
+        if request.user.id is None or not f"{request.user.id}" in room_name:
+            return render(request, "chat_platform/401_forbidden.html",context={})
+        
     return render(request, "chat_platform/room.html", context = context)
 
-
+def private_room(request, user_1, user_2):
+    redis_connection = redis.from_url(settings.CACHES["default"]["LOCATION"])
+    private_rooms = [
+        f"chat_{user_1}_{user_2}",
+        f"chat_{user_2}_{user_1}"
+        ]
+    for room in private_rooms:
+        if redis_connection.exists(f"{room}") or redis_connection.exists(f"asgi:group:{room}"):
+            room = room.replace("chat_", "")
+            return HttpResponseRedirect(f"/room/{room}/")
+        elif Chats.objects.filter(room=room).exists():
+            room = room.replace("chat_", "")
+            return HttpResponseRedirect(f"/room/{room}/")
+    
+    return HttpResponseRedirect(f"/room/{user_1}_{user_2}/")
