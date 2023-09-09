@@ -4,10 +4,11 @@ from django.conf import settings
 import aioredis, asyncio
 from .tasks import master_process_chats_redis_to_postgres, master_process_chats_to_cache
 
-
 class ChatConsumer(AsyncWebsocketConsumer):
     rooms = {}
     chats = {}
+    redis_url = settings.CACHES["default"]["LOCATION"]
+    redis_connection = aioredis.from_url(redis_url)
 
     async def fill_to_cache(self):
         result = master_process_chats_to_cache.delay(
@@ -21,8 +22,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-        self.redis_url = settings.CACHES["default"]["LOCATION"]
-        self.redis_connection = aioredis.from_url(self.redis_url)
         self.rooms.setdefault(self.room_group_name, 0)
         self.chats.setdefault(self.room_group_name, 0)
         self.rooms[self.room_group_name] += 1
@@ -38,8 +37,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if self.rooms[self.room_group_name] == 1:
             self.initial = len(data_list)
             self.chats[self.room_group_name] = self.initial + 1
-
-        # create some logic for new joinees to see all the messages, basically read from redis if data is available
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.redis_connection.expire(self.room_group_name, settings.CACHES_TTL)
