@@ -27,6 +27,7 @@ plus the challenge of making the chats persistent was another challenge on top o
 
 ### Fannout Approach Representation
 ![Image](Images/Dev_Community_Fannout_IMG.png)
+
 Above Image belongs to [Crash Course on Fan-out & Fan-in with AWS Lambda by Dev Community](https://dev.to/byrro/crash-course-on-fan-out-fan-in-with-aws-lambda-47g0)
 
 You must be wondering why "all the new entires" is in bold, the reason is redis db will contain all the messages in that chat room but most of these messages could already be saved in our persistent db, so to prevent them from being saved again a initial value is also taken when the first user connects to a specific room this initial value is just the length of all the previous message so our system will be able to identify the new messages. 
@@ -34,6 +35,7 @@ You must be wondering why "all the new entires" is in bold, the reason is redis 
 Also, the caching we just performed here, where data is cached first and then asynchorusly made persistent is called **write-back caching.**, [Read more about it here](https://github.com/karanpratapsingh/system-design#write-back-cache)
 ### Write Back Caching Representation
 ![Image](https://raw.githubusercontent.com/karanpratapsingh/portfolio/master/public/static/courses/system-design/chapter-I/caching/write-back-cache.png)
+
 Above image belongs to [System Design by Karan Pratap Singh](https://github.com/karanpratapsingh/system-design)
 
 3. So Now we have a perfect system where user can write messages, these new messages are immediately stored on a fast db like redis and then asynchorusly made persistent on a db like postgres, But what about reading, We are able to save all the messages but even now if a person refresh the page he won't see the old messages or new joinees will also not see the old message.
